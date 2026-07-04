@@ -1,7 +1,7 @@
 [project]
-name = "ekw-pobieracz-mapaaspen"
+name = "polish-kw-fetcher"
 version = "0.1.0"
-description = "Secrets-free Polish EKW land-register fetcher using WebShare, Camoufox and 2Captcha"
+description = "Generic Polish EKW/KW land-register fetcher using WebShare, Camoufox and 2Captcha"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [

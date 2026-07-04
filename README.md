@@ -1,62 +1,62 @@
-# eKW pobieracz — MapaAspen variant
+# Polish KW Land Register Fetcher
 
-Czyste repo z kodem użytym do pobierania treści polskich ksiąg wieczystych (EKW) w układzie zbliżonym do `eKW-pobieracz`: osobne pliki dla działów I-O, I-Sp, II, III i IV oraz zbiorcze indeksy JSON/CSV.
+Generic, reusable code for fetching Polish land and mortgage register (Elektroniczne Księgi Wieczyste / EKW) records by KW number.
 
-Repo **nie zawiera** pobranych ksiąg, raportów, logów, cookie, profili przeglądarki ani sekretów. Klucze API są czytane wyłącznie ze zmiennych środowiskowych.
+The main batch fetcher writes one output file set per logical register section: I-O, I-Sp, II, III and IV, plus combined JSON/TXT and run-level indexes. The repository contains only source code and examples — no fetched register data, logs, cookies, browser profiles or API secrets.
 
-## Zawartość
+## Contents
 
-- `scripts/fetch_ekw_pobieracz_format.py` — główny batch fetcher używany przy pobieraniu KW; WebShare + Camoufox + 2Captcha, rotacja proxy i zapisy w `data/kw/`.
-- `scripts/fetch_complete_kw.py` — prostszy fetcher jednej księgi do diagnostyki/pojedynczego pobrania.
-- `scripts/fetch_ekw_playwright.py` — łagodny Playwright smoke-test formularza EKW bez masowego pobierania.
-- `examples/kw_list.txt` — przykładowa lista wejściowa.
+- `scripts/fetch_ekw_sections.py` — main batch fetcher for KW records; uses WebShare proxy rotation, Camoufox and 2Captcha, and writes outputs under `data/kw/` by default.
+- `scripts/fetch_complete_kw.py` — simpler single-KW diagnostic fetcher.
+- `scripts/fetch_ekw_playwright.py` — gentle Playwright smoke-test for the EKW search form.
+- `examples/kw_list.txt` — example KW input list.
 
-## Instalacja
+## Installation
 
 ```bash
 python3 -m venv .venv
 . .venv/bin/activate
 pip install -r requirements.txt
-# jeśli Camoufox/Playwright wymaga instalacji przeglądarek w danym środowisku:
+# If your environment needs browser binaries:
 python -m playwright install chromium
 ```
 
-## Konfiguracja sekretów
+## Secret configuration
 
 ```bash
 cp .env.example .env
-# uzupełnij lokalnie: WEBSHARE_API_TOKEN i TWO_CAPTCHA_API_KEY
+# Fill WEBSHARE_API_TOKEN and TWO_CAPTCHA_API_KEY locally.
 set -a; . ./.env; set +a
 ```
 
-Wymagane:
+Required variables:
 
-| Zmienna | Opis |
+| Variable | Description |
 |---|---|
-| `WEBSHARE_API_TOKEN` | token WebShare API do pobierania listy proxy |
-| `TWO_CAPTCHA_API_KEY` / `TWOCAPTCHA_API_KEY` | klucz 2Captcha do hCaptcha/Incapsula |
+| `WEBSHARE_API_TOKEN` | WebShare API token used to fetch proxy inventory |
+| `TWO_CAPTCHA_API_KEY` / `TWOCAPTCHA_API_KEY` | 2Captcha key used for hCaptcha/Incapsula challenges |
 
-Przydatne opcjonalne:
+Useful optional variables:
 
-| Zmienna | Domyślnie | Opis |
+| Variable | Default | Description |
 |---|---:|---|
-| `EKW_KW_LIST_FILE` | auto z `data/kw/linked_kw` | plik z numerami KW, po jednym wierszu |
-| `EKW_DETAILED_OUTPUT_ROOT` | `data/kw` | katalog wynikowy |
-| `EKW_BATCH_LIMIT` | brak | limit liczby KW do testu |
-| `WEBSHARE_PROXY_LIMIT` | `20` | liczba pobieranych proxy |
-| `EKW_MAX_PROXY_ROUNDS` | liczba proxy | maks. liczba rund proxy |
-| `CAMOUFOX_HEADLESS` | `virtual` | tryb Camoufox |
+| `EKW_KW_LIST_FILE` | auto-discovery from `data/kw/linked_kw` | Input file with one KW per line |
+| `EKW_DETAILED_OUTPUT_ROOT` | `data/kw` | Output root |
+| `EKW_BATCH_LIMIT` | unset | Limit number of KWs for a test run |
+| `WEBSHARE_PROXY_LIMIT` | `20` | Number of proxies requested from WebShare |
+| `EKW_MAX_PROXY_ROUNDS` | number of proxies | Maximum proxy/browser rounds |
+| `CAMOUFOX_HEADLESS` | `virtual` | Camoufox headless mode |
 
-## Użycie batch
+## Batch usage
 
 ```bash
 set -a; . ./.env; set +a
 EKW_KW_LIST_FILE=examples/kw_list.txt \
 EKW_DETAILED_OUTPUT_ROOT=data/kw \
-python scripts/fetch_ekw_pobieracz_format.py
+python scripts/fetch_ekw_sections.py
 ```
 
-Wyniki są tworzone pod `data/kw/` i ignorowane przez git. Dla każdej KW powstają m.in.:
+Outputs are written under `data/kw/`, which is ignored by git. For each KW the batch fetcher creates files similar to:
 
 ```text
 WA1P.00107308.6_1o.txt/json/html
@@ -67,17 +67,17 @@ WA1P.00107308.6_4.txt/json/html
 WA1P.00107308.6_ALL.txt/json
 ```
 
-Dodatkowo batch zapisuje `_section_index.json`, `_dzial_1o.json`, `_dzial_1o.csv` oraz `progress.json`.
+The batch run also writes `_section_index.json`, `_dzial_1o.json`, `_dzial_1o.csv` and `progress.json`.
 
-## Smoke-test pojedynczej KW
+## Single-KW smoke test
 
 ```bash
 set -a; . ./.env; set +a
 EKW_KW=WA1P/00107308/6 EKW_OUTPUT_DIR=runs python scripts/fetch_complete_kw.py
 ```
 
-## Higiena danych
+## Data hygiene
 
-- `.env`, `data/`, `runs/`, `reports/`, HTML/PDF/screenshoty, cookie i profile przeglądarki są ignorowane.
-- Skrypty logują ID zadań i długości tokenów, ale nie zapisują wartości tokenów API, hCaptcha ani haseł proxy.
-- Publiczne eksporty w głównym batch fetcherze redagują PESEL-like identyfikatory.
+- `.env`, `data/`, `runs/`, `reports/`, HTML/PDF/screenshot outputs, cookies and browser profiles are ignored.
+- Scripts log task IDs and token lengths only; they do not write API keys, captcha tokens or proxy passwords to output.
+- Public exports from the main batch fetcher redact PESEL-like identifiers.

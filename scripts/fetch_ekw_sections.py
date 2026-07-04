@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Fetch EKW records and save them in an eKW-pobieracz-like layout.
+"""Fetch EKW/KW records and save them in a section-oriented layout.
 
-Output format intentionally follows SzczepanLeon/Rzezimioszek eKW-pobieracz naming:
+Output format uses compact suffixes for the five logical register sections:
   WA1P.00107308.6_1o.html / .txt / .json  -> Dział I-O
   WA1P.00107308.6_1s.html / .txt / .json  -> Dział I-Sp
   WA1P.00107308.6_2.html  / .txt / .json  -> Dział II
@@ -9,7 +9,7 @@ Output format intentionally follows SzczepanLeon/Rzezimioszek eKW-pobieracz nami
   WA1P.00107308.6_4.html  / .txt / .json  -> Dział IV
 
 Additionally writes per-KW ALL.json/TXT and run-level _dzial_1o.json/_dzial_1o.csv
-with parcel rows, similar to eKW-pobieracz's extract_html.py.
+with parcel rows.
 
 Secrets are read only from environment:
   WEBSHARE_API_TOKEN
@@ -190,7 +190,7 @@ def get_proxies(n: int) -> list[dict[str, Any]]:
     if env("WEBSHARE_PLAN_ID"):
         qs["plan_id"] = env("WEBSHARE_PLAN_ID") or ""
     url = "https://proxy.webshare.io/api/v2/proxy/list/?" + urllib.parse.urlencode(qs)
-    data = http_json(url, headers={"Authorization": f"Token {token}", "Accept": "application/json", "X-Webshare-Source": "MapaAspen/ekw-pobieracz-format"}, timeout=30)
+    data = http_json(url, headers={"Authorization": f"Token {token}", "Accept": "application/json", "X-Webshare-Source": "polish-kw-fetcher"}, timeout=30)
     return data.get("results", [])
 
 
@@ -473,7 +473,7 @@ async def save_kw_sections(page, kw: str, proxy_label: str) -> bool:
         "kw": kw,
         "fetched_at": datetime.now(UTC).isoformat(),
         "proxy": proxy_label,
-        "format": "ekw-pobieracz-like",
+        "format": "section-oriented-kw-export",
         "sections": sections,
         "text": combined_text,
     }
