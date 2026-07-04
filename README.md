@@ -1,4 +1,4 @@
-# Polish KW Land Register Fetcher
+# KW Fetcher
 
 Generic, reusable code for fetching Polish land and mortgage register (Elektroniczne Księgi Wieczyste / EKW) records by KW number.
 

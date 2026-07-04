@@ -1,5 +1,5 @@
 [project]
-name = "polish-kw-fetcher"
+name = "kw-fetcher"
 version = "0.1.0"
 description = "Generic Polish EKW/KW land-register fetcher using WebShare, Camoufox and 2Captcha"
 readme = "README.md"

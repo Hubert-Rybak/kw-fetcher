@@ -190,7 +190,7 @@ def get_proxies(n: int) -> list[dict[str, Any]]:
     if env("WEBSHARE_PLAN_ID"):
         qs["plan_id"] = env("WEBSHARE_PLAN_ID") or ""
     url = "https://proxy.webshare.io/api/v2/proxy/list/?" + urllib.parse.urlencode(qs)
-    data = http_json(url, headers={"Authorization": f"Token {token}", "Accept": "application/json", "X-Webshare-Source": "polish-kw-fetcher"}, timeout=30)
+    data = http_json(url, headers={"Authorization": f"Token {token}", "Accept": "application/json", "X-Webshare-Source": "kw-fetcher"}, timeout=30)
     return data.get("results", [])
 
 

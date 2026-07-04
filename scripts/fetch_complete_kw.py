@@ -108,7 +108,7 @@ def get_webshare_proxies(limit: int) -> list[dict[str, Any]]:
         headers={
             "Authorization": f"Token {token}",
             "Accept": "application/json",
-            "X-Webshare-Source": "polish-kw-fetcher",
+            "X-Webshare-Source": "kw-fetcher",
         },
         timeout=30,
     )
