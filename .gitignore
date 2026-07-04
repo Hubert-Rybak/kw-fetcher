@@ -1,0 +1,38 @@
+# Secrets / local config
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cookie
+*cookie*
+*storage_state*
+
+# Runtime outputs / fetched registry content
+data/
+runs/
+reports/
+output/
+*.log
+*.html
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.pdf
+
+# Browser / automation state
+.cache/
+camoufox*/
+playwright*/
+profile*/
+user-data-dir/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
